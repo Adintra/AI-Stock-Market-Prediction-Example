@@ -42,10 +42,10 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Start Page", font=("Verdana", 12))
         label.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Page 1 (Dev)",  # Lambda throwaway function to call button function
+        button1 = ttk.Button(self, text="Page 1 (Dev)",  # Lambda throwaway function to call button class controller
                              command=lambda: controller.show_frame(PageOne))
         button1.pack()
-        button2 = ttk.Button(self, text="Page 2 (Dev)",  # Lambda throwaway function to call button function
+        button2 = ttk.Button(self, text="Page 2 (Dev)",  # Lambda throwaway function to call button class controller
                              command=lambda: controller.show_frame(PageTwo))
         button2.pack()
 
@@ -56,9 +56,20 @@ class PageOne(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="In Development", font=("Verdana", 12))
         label.pack(pady=10, padx=10)
-        button1 = ttk.Button(self, text="Home",  # Lambda throwaway function to call button function
+        button1 = ttk.Button(self, text="Home",  # Lambda throwaway function to call button class controller
                              command=lambda: controller.show_frame(StartPage))
         button1.pack()
+
+        # Matplotlib code
+        page_figure = Figure(figsize=(5, 5), dpi=100)
+        subplot1 = page_figure.add_subplot(111)
+        subplot1.plot([1, 2, 3, 4, 5, 6, 7, 8], [5, 6, 1, 3, 8, 9, 3, 5])
+        canvas = FigureCanvasTkAgg(page_figure, self)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
 
 class PageTwo(tk.Frame):
@@ -67,7 +78,7 @@ class PageTwo(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="In Development", font=("Verdana", 12))
         label.pack(pady=10, padx=10)
-        button1 = ttk.Button(self, text="Home",  # Lambda throwaway function to call button function
+        button1 = ttk.Button(self, text="Home",  # Lambda throwaway function to call button class controller
                              command=lambda: controller.show_frame(StartPage))
         button1.pack()
 
