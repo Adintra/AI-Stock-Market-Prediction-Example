@@ -8,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 # Plotting datetime with matplotlib
 from pandas.plotting import register_matplotlib_converters
+
 register_matplotlib_converters()
 
 
@@ -46,11 +47,29 @@ class AIDataLoader:
     def input_data(self, window_size):
         out = []
         length = len(self.train_norm)
-        for i in range(length-window_size):
-            window = self.train_norm[i:i+window_size]
-            label = self.train_norm[i+window_size:i+window_size+1]
+        for i in range(length - window_size):
+            window = self.train_norm[i:i + window_size]
+            label = self.train_norm[i + window_size:i + window_size + 1]
             out.append((window, label))
         return out
+
+    class LSTMnetwork(nn.Module):
+        def __init__(self, input_size=1, hidden_size=100, output_size=1):
+            super().__init__()
+            self.hidden_size = hidden_size
+
+            # LSTM layer
+            self.lstm = nn.LSTM(input_size, hidden_size)
+            # Fully connected layer
+            self.linear = nn.Linear(hidden_size, output_size)
+            # Initialize feedback of lstm neurons
+            self.hidden = (torch.zeros(1, 1, self.hidden_size),
+                           torch.zeros(1, 1, self.hidden_size))
+
+        def forward(self, seq):
+            lstm_out, self.hidden = self.lstm(seq.view(len(seq), 1, -1), self.hidden)
+            pred = self.linear(lstm_out.view(len(seq), -1))
+            return pred[-1]  # Only need last value
 
 
 if __name__ == "__main__":
