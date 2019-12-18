@@ -93,7 +93,7 @@ class PageOne(tk.Frame):
         # Forecast graph (in development)
         forecast_label = ttk.Label(graph_buttons_frame, text="Forecast Prediction", font=("Verdana", 12))
         forecast_label.grid(column=0, row=1, pady=5)
-        forecast_label2_text = "Please enter date of prediction in form of dd/mm/yy"
+        forecast_label2_text = "Please enter date of prediction in form of yyyy/mm/dd"
         forecast_label2 = ttk.Label(graph_buttons_frame, text=forecast_label2_text, font=("Verdana", 10))
         forecast_label2.grid(column=0, row=2, pady=5)
         self.forecast_entry_text = tk.StringVar()  # Needs to be object related and not in the scope of init
@@ -108,6 +108,7 @@ class PageOne(tk.Frame):
 
     def get_forecast_entry(self):
         print(self.forecast_entry_text.get())
+        self.forecast_entry_text.set("")
 
 
 class PageTwo(tk.Frame):
