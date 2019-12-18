@@ -60,8 +60,8 @@ class PageOne(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # Top title and home button
-        label = ttk.Label(self, text="In Development", font=("Verdana", 12))
-        label.grid(column=0, row=0, columnspan=2)
+        page_title = ttk.Label(self, text="In Development", font=("Verdana", 12))
+        page_title.grid(column=0, row=0, columnspan=2)
         button1 = ttk.Button(self, text="Home",  # Lambda throwaway function to call button class controller
                              command=lambda: controller.show_frame(StartPage))
         button1.grid(column=0, row=1, columnspan=2)
@@ -79,9 +79,35 @@ class PageOne(tk.Frame):
         toolbar_frame.grid(column=0, row=2, sticky="w")
         toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
         toolbar.update()
-        #canvas._tkcanvas.grid(column=0, row=4)
+        # canvas._tkcanvas.grid(column=0, row=4)
 
+        # Buttons frame
+        graph_buttons_frame = tk.Frame(master=self)
+        graph_buttons_frame.grid(column=1, row=3)
+
+        # Accuracy graph (in development)
+        button2 = ttk.Button(graph_buttons_frame, text="Accuracy (dev)",  # Lambda throwaway function
+                             command=lambda: controller.show_frame(StartPage))
+        button2.grid(column=0, row=0, pady=50)
+
+        # Forecast graph (in development)
+        forecast_label = ttk.Label(graph_buttons_frame, text="Forecast Prediction", font=("Verdana", 12))
+        forecast_label.grid(column=0, row=1, pady=5)
+        forecast_label2_text = "Please enter date of prediction in form of dd/mm/yy"
+        forecast_label2 = ttk.Label(graph_buttons_frame, text=forecast_label2_text, font=("Verdana", 10))
+        forecast_label2.grid(column=0, row=2, pady=5)
+        self.forecast_entry_text = tk.StringVar()  # Needs to be object related and not in the scope of init
+        forecast_entry = ttk.Entry(master=graph_buttons_frame, width=20, textvariable=self.forecast_entry_text)
+        forecast_entry.grid(column=0, row=3)
+        forecast_button = ttk.Button(graph_buttons_frame, text="Predict",  # Lambda throwaway function
+                                     command=lambda: self.get_forecast_entry())
+        forecast_button.grid(column=1, row=3)
+
+        graph_buttons_frame.columnconfigure(1, weight=1)
         self.columnconfigure(1, weight=1)
+
+    def get_forecast_entry(self):
+        print(self.forecast_entry_text.get())
 
 
 class PageTwo(tk.Frame):
