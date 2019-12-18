@@ -14,11 +14,12 @@ class AIDataLoader:
 
     def __init__(self, dataset):
         # List of datasets available
-        self.datasets = ("Tesla")
+        self.datasets = ["Tesla"]
+        self.dataset = dataset
         # Default dataset for unknown dataset entered
         if dataset not in self.datasets:
             self.dataset = "Tesla"
-        self.datapath = "Data/" + dataset + ".csv"
+        self.datapath = "Data/" + self.dataset + ".csv"
 
         # Pandas dataset
         self.df = pd.read_csv(self.datapath, index_col=0, parse_dates=True)
