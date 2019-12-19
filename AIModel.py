@@ -56,55 +56,56 @@ class AIDataLoader:
             out.append((window, label))
         return out
 
-    class LSTMnetwork(nn.Module):
 
-        def __init__(self, input_size=1, hidden_size=100, output_size=1, data_set="Tesla"):
-            super().__init__()
-            self.hidden_size = hidden_size
+class LSTMnetwork(nn.Module):
 
-            # LSTM layer
-            self.lstm = nn.LSTM(input_size, hidden_size)
-            # Fully connected layer
-            self.linear = nn.Linear(hidden_size, output_size)
-            # Initialize feedback of lstm neurons
-            self.hidden = (torch.zeros(1, 1, self.hidden_size),
-                           torch.zeros(1, 1, self.hidden_size))
+    def __init__(self, input_size=1, hidden_size=100, output_size=1, data_set="Tesla"):
+        super().__init__()
+        self.hidden_size = hidden_size
 
-            # Initialize data sets
-            self.data_set = data_set
-            if data_set not in DATA_SETS:
-                self.data_set = "Tesla"
-            self.data_loader = AIDataLoader(data_set)
+        # LSTM layer
+        self.lstm = nn.LSTM(input_size, hidden_size)
+        # Fully connected layer
+        self.linear = nn.Linear(hidden_size, output_size)
+        # Initialize feedback of lstm neurons
+        self.hidden = (torch.zeros(1, 1, self.hidden_size),
+                       torch.zeros(1, 1, self.hidden_size))
 
-            # Loss and optimization
-            self.criterion = nn.MSELoss()
-            self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+        # Initialize data sets
+        self.data_set = data_set
+        if data_set not in DATA_SETS:
+            self.data_set = "Tesla"
+        self.data_loader = AIDataLoader(data_set)
 
-        def forward(self, seq):
-            lstm_out, self.hidden = self.lstm(seq.view(len(seq), 1, -1), self.hidden)
-            pred = self.linear(lstm_out.view(len(seq), -1))
-            return pred[-1]  # Only need last value
+        # Loss and optimization
+        self.criterion = nn.MSELoss()
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
 
-        def train_network_train_data(self, epochs):
-            start_time = time.time()
-            for epoch in range(epochs):
+    def forward(self, seq):
+        lstm_out, self.hidden = self.lstm(seq.view(len(seq), 1, -1), self.hidden)
+        pred = self.linear(lstm_out.view(len(seq), -1))
+        return pred[-1]  # Only need last value
 
-                # Seq and label from training data
-                for seq, y_train in self.data_loader.train_data:
-                    # Parameter reset
-                    self.optimizer.zero_grad()
-                    self.hidden = (torch.zeros(1, 1, self.hidden_size),
-                                   torch.zeros(1, 1, self.hidden_size))
-                    y_prediction = self(seq)
-                    loss = self.criterion(y_prediction, y_train)
-                    loss.backward()
-                    self.optimizer.step()
+    def train_network_train_data(self, epochs):
+        start_time = time.time()
+        for epoch in range(epochs):
 
-                # training result
-                print(f'Epoch: {epoch + 1:2} Loss: {loss.item():10.8f}')
+            # Seq and label from training data
+            for seq, y_train in self.data_loader.train_data:
+                # Parameter reset
+                self.optimizer.zero_grad()
+                self.hidden = (torch.zeros(1, 1, self.hidden_size),
+                               torch.zeros(1, 1, self.hidden_size))
+                y_prediction = self(seq)
+                loss = self.criterion(y_prediction, y_train)
+                loss.backward()
+                self.optimizer.step()
 
-            # Duration
-            print(f'\nDuration: {time.time() - start_time:.0f} seconds')
+            # training result
+            print(f'Epoch: {epoch + 1:2} Loss: {loss.item():10.8f}')
+
+        # Duration
+        print(f'\nDuration: {time.time() - start_time:.0f} seconds')
 
 
 if __name__ == "__main__":
