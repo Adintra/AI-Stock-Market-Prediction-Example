@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 # Plotting datetime with matplotlib
+import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 import time
 from AI_Data_Loader import AIDataLoader
@@ -14,6 +15,8 @@ class LSTMnetwork(nn.Module):
 
     def __init__(self, input_size=1, hidden_size=100, output_size=1, data_set="Tesla"):
         super().__init__()
+        self.trained = False
+
         self.hidden_size = hidden_size
 
         # LSTM layer
@@ -59,13 +62,18 @@ class LSTMnetwork(nn.Module):
 
         # Duration
         print(f'\nDuration: {time.time() - start_time:.0f} seconds')
+        self.trained = True
+
+    def save_model(self):
+        if self.trained:
+            torch.save(self.state_dict(), self.data_set + ".pt")
+        else:
+            print("Model has not been trained. Please train or load model.")
+
+    def load_model(self):
+        self.load_state_dict(torch.load(self.data_set + '.pt'))
 
 
 if __name__ == "__main__":
-    tesla_dataloader = AIDataLoader("Tesla")
-    print(tesla_dataloader.df.head())
-    print(tesla_dataloader.df_initial_length)
-    print(tesla_dataloader.df_dropped_length)
-    print(tesla_dataloader.data.head())
-    print(tesla_dataloader.test_set)
-    print(tesla_dataloader.train_data[0])
+    pass
+
