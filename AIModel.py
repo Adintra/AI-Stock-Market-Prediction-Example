@@ -9,22 +9,25 @@ from sklearn.preprocessing import MinMaxScaler
 # Plotting datetime with matplotlib
 from pandas.plotting import register_matplotlib_converters
 
+import time
+
 register_matplotlib_converters()
+
+DATA_SETS = ["Tesla"]
 
 
 class AIDataLoader:
 
-    def __init__(self, dataset):
-        # List of datasets available
-        self.datasets = ["Tesla"]
-        self.dataset = dataset
-        # Default dataset for unknown dataset entered
-        if dataset not in self.datasets:
-            self.dataset = "Tesla"
-        self.datapath = "Data/" + self.dataset + ".csv"
+    def __init__(self, data_set):
+        # List of data sets available
+        self.data_set = data_set
+        # Default data set for unknown data set entered
+        if data_set not in DATA_SETS:
+            self.data_set = "Tesla"
+        self.data_path = "Data/" + self.data_set + ".csv"
 
-        # Pandas dataset
-        self.df = pd.read_csv(self.datapath, index_col=0, parse_dates=True)
+        # Pandas data set
+        self.df = pd.read_csv(self.data_path, index_col=0, parse_dates=True)
         self.df_initial_length = len(self.df)
         self.df.dropna(inplace=True)  # Drop missing values
         self.df_dropped_length = len(self.df)
@@ -54,7 +57,8 @@ class AIDataLoader:
         return out
 
     class LSTMnetwork(nn.Module):
-        def __init__(self, input_size=1, hidden_size=100, output_size=1):
+
+        def __init__(self, input_size=1, hidden_size=100, output_size=1, data_set="Tesla"):
             super().__init__()
             self.hidden_size = hidden_size
 
@@ -66,10 +70,41 @@ class AIDataLoader:
             self.hidden = (torch.zeros(1, 1, self.hidden_size),
                            torch.zeros(1, 1, self.hidden_size))
 
+            # Initialize data sets
+            self.data_set = data_set
+            if data_set not in DATA_SETS:
+                self.data_set = "Tesla"
+            self.data_loader = AIDataLoader(data_set)
+
+            # Loss and optimization
+            self.criterion = nn.MSELoss()
+            self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+
         def forward(self, seq):
             lstm_out, self.hidden = self.lstm(seq.view(len(seq), 1, -1), self.hidden)
             pred = self.linear(lstm_out.view(len(seq), -1))
             return pred[-1]  # Only need last value
+
+        def train_network_train_data(self, epochs):
+            start_time = time.time()
+            for epoch in range(epochs):
+
+                # Seq and label from training data
+                for seq, y_train in self.data_loader.train_data:
+                    # Parameter reset
+                    self.optimizer.zero_grad()
+                    self.hidden = (torch.zeros(1, 1, self.hidden_size),
+                                   torch.zeros(1, 1, self.hidden_size))
+                    y_prediction = self(seq)
+                    loss = self.criterion(y_prediction, y_train)
+                    loss.backward()
+                    self.optimizer.step()
+
+                # training result
+                print(f'Epoch: {epoch + 1:2} Loss: {loss.item():10.8f}')
+
+            # Duration
+            print(f'\nDuration: {time.time() - start_time:.0f} seconds')
 
 
 if __name__ == "__main__":
